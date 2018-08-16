@@ -32,16 +32,6 @@
   shell: mongo localhost:{{ mongod_port }}/admin /tmp/repset_init.js
   when: inventory_hostname in groups.replication_init
 
-### Arbiter set up ###
-
-- name: Create the file to add an arbiter to the mongodb replica set
-  template: src=addArbiter.j2 dest=/tmp/addArbiter.js
-  when: inventory_hostname in groups.replication_init
-
-- name: Add the arbiter
-  shell: mongo localhost:{{ mongod_port }}/admin /tmp/addArbiter.js
-  when: inventory_hostname in groups.replication_init
-
 - name: Add the admin user
   mongodb_user: 
     database: admin
@@ -51,3 +41,13 @@
     roles: clusterAdmin,dbAdminAnyDatabase,readWriteAnyDatabase,userAdminAnyDatabase
     state: present
   ignore_errors: yes
+
+### Arbiter set up ###
+
+- name: Create the file to add an arbiter to the mongodb replica set
+  template: src=addArbiter.j2 dest=/tmp/addArbiter.js
+  when: inventory_hostname in groups.replication_init
+
+- name: Add the arbiter
+  shell: mongo localhost:{{ mongod_port }}/admin /tmp/addArbiter.js
+  when: inventory_hostname in groups.replication_init
