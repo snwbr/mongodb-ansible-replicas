@@ -35,11 +35,3 @@
 - name: Set SELinux rules to allow MongoDB ports {{ mongodb_port_range }}
   shell: semanage port -a -t mongod_port_t -p tcp {{ mongodb_port_range }}
   ignore_errors: yes
-
-- name: Set SELinux rules to allow MongoDB port {{ mongos_port }}
-  shell: semanage port -a -t mongod_port_t -p tcp {{ mongos_port }}
-  ignore_errors: yes
-
-- name: Set SELinux rules to allow MongoDB port {{ mongoc_port }}
-  shell: semanage port -a -t mongod_port_t -p tcp {{ mongoc_port }}
-  ignore_errors: yes

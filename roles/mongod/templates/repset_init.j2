@@ -1,14 +1,13 @@
 rs.initiate( {
-   _id : "{{ shardReplica }}",
+   _id : "{{ replicaSet }}",
    members: [
-{% set hosts = '' %}
-{% set shards = [] %}
-{% for host in groups['mongo_servers'] %}
-{% if hostvars[host].shardReplica == shardReplica %}
-{{ shards.append(host) }}
+{% set members = [] %}
+{% for host in groups['replication_servers'] %}
+{% if hostvars[host].replicaSet == replicaSet %}
+{{ members.append(host) }}
 {% endif %}
 {% endfor %}
-{% for host in shards %}
+{% for host in members %}
 {% if loop.last %}
      { _id: {{ loop.index0 }}, host: "{{ host }}:{{ mongod_port }}" }
 {% else %}

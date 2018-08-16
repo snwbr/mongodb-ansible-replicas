@@ -1,0 +1,11 @@
+{% set members = [] %}
+{% for host in groups['arbiters'] %}
+{% if hostvars[host].replicaSet == hostvars[{{ inventory_hostname }}].replicaSet %}
+{{ members.append(host) }}
+{% endif %}
+{% endfor %}
+{% for host in members %}
+rs.addArb("{{ host }}:{{ mongod_port }}")
+{% endfor %}
+sleep(20000)
+rs.status()

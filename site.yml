@@ -13,13 +13,3 @@
   become: yes
   roles:
   - role: mongod
-
-- hosts: mongoc_servers
-  become: yes
-  roles:
-  - role: mongoc
-
-- hosts: mongos_servers
-  become: yes
-  roles:
-  - role: mongos
