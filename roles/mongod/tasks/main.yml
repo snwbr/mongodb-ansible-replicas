@@ -49,5 +49,5 @@
   when: inventory_hostname in groups.replication_init
 
 - name: Add the arbiter
-  shell: mongo localhost:{{ mongod_port }}/admin /tmp/addArbiter.js
+  shell: mongo localhost:{{ mongod_port }}/admin -u {{ mongo_admin_user }} -p {{ mongo_admin_pass }} /tmp/addArbiter.js
   when: inventory_hostname in groups.replication_init
