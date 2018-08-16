@@ -1,0 +1,21 @@
+rs.initiate( {
+   _id : "{{ shardReplica }}",
+   members: [
+{% set hosts = '' %}
+{% set shards = [] %}
+{% for host in groups['mongo_servers'] %}
+{% if hostvars[host].shardReplica == shardReplica %}
+{{ shards.append(host) }}
+{% endif %}
+{% endfor %}
+{% for host in shards %}
+{% if loop.last %}
+     { _id: {{ loop.index0 }}, host: "{{ host }}:{{ mongod_port }}" }
+{% else %}
+     { _id: {{ loop.index0 }}, host: "{{ host }}:{{ mongod_port }}" },
+{% endif %}
+{% endfor %}
+   ]
+})
+sleep(20000)
+rs.status()

@@ -1,0 +1,16 @@
+rs.initiate( {
+   _id : "replconfig01",
+   configsvr: true,
+   members: [
+{% set hosts = '' %}
+ {% for host in groups['mongoc_servers'] %}
+    {% if loop.last %}
+      { _id: {{ loop.index0 }}, host: "{{ host }}:{{ mongoc_port }}" }
+    {% else %}
+      { _id: {{ loop.index0 }}, host: "{{ host }}:{{ mongoc_port }}" },
+    {% endif %}
+ {% endfor %}
+   ]
+})
+sleep(20000)
+rs.status()

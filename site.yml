@@ -1,0 +1,25 @@
+---
+# This Playbook would deploy the whole mongodb cluster with replication and sharding.
+
+- hosts: all
+  remote_user: snwbr
+  become: yes
+  gather_facts: yes
+  
+  roles:
+  - role: common
+
+- hosts: mongo_servers
+  become: yes
+  roles:
+  - role: mongod
+
+- hosts: mongoc_servers
+  become: yes
+  roles:
+  - role: mongoc
+
+- hosts: mongos_servers
+  become: yes
+  roles:
+  - role: mongos

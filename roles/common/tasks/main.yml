@@ -1,0 +1,45 @@
+---
+# This Playbook runs all the common plays in the deployment
+
+- name: Create the hosts file for all machines
+#  template: src=hosts.j2 dest=/etc/hosts
+  lineinfile: dest=/etc/hosts regexp='.*{{ item }}$' line="{{ hostvars[item].ansible_default_ipv4.address }} {{item}}" state=present
+  when: hostvars[item].ansible_default_ipv4.address is defined
+  with_items: "{{ groups['all'] }}"
+
+- name: Create the repository for MongoDB
+  copy: src=mongodb-org-4.0.repo.j2 dest=/etc/yum.repos.d/mongodb-org-4.0.repo
+
+- name: Create the EPEL Repository
+  yum: name={{ item }} state=installed
+  with_items:
+   - https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+
+- name: Create the mongod user
+  user: name=mongod comment="MongoD"
+
+- name: Create the data directory for the namenode metadata
+  file: path={{ mongodb_datadir_prefix }} owner=mongod group=mongod state=directory setype=mongod_var_lib_t recurse=true
+
+- name: Install the mongodb package
+  yum: name={{ item }} state=installed
+  with_items:
+   - libselinux-python
+   - mongodb-org
+   - bc
+   - python-pip
+
+- name: Install the latest pymongo package
+  pip: name=pymongo state=latest use_mirrors=no
+  
+- name: Set SELinux rules to allow MongoDB ports {{ mongodb_port_range }}
+  shell: semanage port -a -t mongod_port_t -p tcp {{ mongodb_port_range }}
+  ignore_errors: yes
+
+- name: Set SELinux rules to allow MongoDB port {{ mongos_port }}
+  shell: semanage port -a -t mongod_port_t -p tcp {{ mongos_port }}
+  ignore_errors: yes
+
+- name: Set SELinux rules to allow MongoDB port {{ mongoc_port }}
+  shell: semanage port -a -t mongod_port_t -p tcp {{ mongoc_port }}
+  ignore_errors: yes

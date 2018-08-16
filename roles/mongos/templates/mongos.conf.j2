@@ -1,0 +1,25 @@
+systemLog:
+  destination: file
+  path: "/var/log/mongodb/mongos.log"
+  logAppend: true
+
+processManagement:
+  fork: true
+
+net:
+  port: {{ mongos_port }}
+  bindIpAll: true
+
+sharding:
+{% set hosts = '' %}
+{% for host in groups['mongoc_servers'] %}
+{% if loop.last %}
+{% set hosts = hosts + host + ':' ~ mongoc_port  %}
+  configDB: replconfig01/{{ hosts }}
+{% else %}
+{% set hosts = hosts + host + ':' ~ mongoc_port + ','  %}
+{% endif %}
+{% endfor %}
+
+security:
+  keyFile: {{ mongodb_datadir_prefix }}secret
